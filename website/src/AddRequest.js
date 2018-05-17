@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './Requests.css';
-import {ButtonGroup, Button, Grid, Col, Collapse, Well, FormGroup, FormControl, ControlLabel, HelpBlock} from 'react-bootstrap'
+import {ButtonGroup, Button, Grid, Col, Fade, Well, FormGroup, FormControl, ControlLabel, HelpBlock} from 'react-bootstrap'
 var validator = require('validator');
 
 class Requests extends Component {
@@ -9,13 +9,45 @@ class Requests extends Component {
     this.state = {
       open: false,
       open_p2: false,
-      url: ""
+      url: "",
+      url_2: "",
+      json: ""
     }
     this.getValidationState = this.getValidationState.bind(this)
+    this.getJsonValidationState = this.getJsonValidationState.bind(this)
     this.changeUrl = this.changeUrl.bind(this)
+    this.submit_get = this.submit_get.bind(this)
+    this.submit_post = this.submit_post.bind(this)
+    this.changePayload = this.changePayload.bind(this)
+    this.changeUrl2 = this.changeUrl2.bind(this)
+    this.getValidationState2 = this.getValidationState2.bind(this)
+  }
+  submit_get(event){
+    event.preventDefault()
+  }
+  submit_post(event){
+    event.preventDefault()
   }
   changeUrl(event){
     this.setState({url: event.target.value})
+  }
+  changeUrl2(event){
+    this.setState({url_2: event.target.value})
+  }
+  changePayload(event){
+    this.setState({json: event.target.value})
+  }
+  getJsonValidationState(){
+    if (validator.isJSON(this.state.json) || this.state.json == null || this.state.json == undefined || this.state.json == ""){
+      return 'success'
+    }
+    return 'error'
+  }
+  getValidationState2(){
+    if (validator.isURL(this.state.url_2)){
+      return 'success'
+    }
+    return 'error'
   }
   getValidationState(){
     if (validator.isURL(this.state.url)){
@@ -23,26 +55,12 @@ class Requests extends Component {
     }
     return 'error'
   }
-  render() {
-    return (
-      <div>
 
-      <div className="bg_main">
-      <h1>Add a request</h1>
-      <p>Add a request here. GET/POST requests supported. More features will be supported soon for requests</p>
-      <br />
-      <ButtonGroup block justified>
-      <Button bsStyle="success" onClick ={() => this.setState({open: !this.state.open, open_p2: false})} href="#" >Add GET request</Button>
-      <Button bsStyle="danger" href="#" onClick={() => this.setState({open:false, open_p2: !this.state.open_p2})}>Add POST request</Button>
-      </ButtonGroup>
-      <Collapse in={this.state.open}>
-      <div>
-      <Well>
-        Pancakes are good
-      </Well>
-      </div>
-      </Collapse>
-      <Collapse in={this.state.open_p2}>
+  render() {
+    let p1 = null
+    let p2 = null
+    if(this.state.open){
+      p1 = <Fade in={this.state.open}>
       <div>
       <Well>
         <form>
@@ -54,16 +72,79 @@ class Requests extends Component {
           <FormControl
             type="text"
             value={this.state.url}
-            placeholder="Enter text"
+            placeholder="Enter URL here"
             onChange={this.changeUrl}
           />
           <FormControl.Feedback />
           <HelpBlock>Must be a valid URL.</HelpBlock>
+          <Button type="submit" onClick = {this.submit_get}>Submit</Button>
         </FormGroup>
       </form>
       </Well>
       </div>
-      </Collapse>
+      </Fade>
+    }
+    else{
+      p1 = null
+    }
+    if(this.state.open_p2){
+      p2 = <Fade in={this.state.open_p2}>
+      <div>
+      <Well>
+        <form>
+        <FormGroup
+          controlId="formBasicText"
+          validationState={this.getValidationState2()}
+        >
+          <p>Enter URL here</p>
+          <FormControl
+            type="text"
+            value={this.state.url_2}
+            placeholder="Enter URL here"
+            onChange={this.changeUrl2}
+          />
+          <FormControl.Feedback />
+          <HelpBlock>Must be a valid URL.</HelpBlock>
+        </FormGroup>
+
+        <FormGroup
+          controlId="formBasicText"
+          validationState={this.getJsonValidationState()}
+        >
+          <p>Enter JSON Payload here</p>
+          <FormControl
+            type="text"
+            value={this.state.json}
+            placeholder="Enter JSON payload here"
+            onChange={this.changePayload}
+          />
+          <FormControl.Feedback />
+          <HelpBlock>Must be a valid JSON object.</HelpBlock>
+          <Button type="submit" onClick = {this.submit_post}>Submit</Button>
+        </FormGroup>
+
+      </form>
+      </Well>
+      </div>
+      </Fade>
+    }
+    else{
+      p2 = null
+    }
+    return (
+      <div>
+
+      <div className="bg_main">
+      <h1>Add a request</h1>
+      <p>Add a request here. GET/POST requests supported. More features will be supported soon for requests</p>
+      <br />
+      <ButtonGroup block justified>
+      <Button bsStyle="success" onClick ={() => this.setState({open: !this.state.open, open_p2: false})} href="#" >Add GET request</Button>
+      <Button bsStyle="danger" href="#" onClick={() => this.setState({open:false, open_p2: !this.state.open_p2})}>Add POST request</Button>
+      </ButtonGroup>
+      <br />
+      {p1}
+      {p2}
       </div>
       </div>
     );
