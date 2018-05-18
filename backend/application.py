@@ -2,6 +2,7 @@ import os
 from flask import Flask, send_from_directory, render_template, request
 import validators
 import requests
+import json
 app = Flask(__name__)
 get_requests = []
 post_requests = []
@@ -9,22 +10,25 @@ post_requests = []
 @app.route('/addNewGet', methods=['POST'])
 def add_new_get():
     link = str(request.form.get('link'))
-    if validators.url(link) == False:
+    print(validators.url(link))
+    if not validators.url(link):
         return "invalid url"
-    get_requests += link
+    global get_requests
+    get_requests.append(link)
     return "success"
 
 @app.route('/addNewPost', methods=['POST'])
 def add_new_post():
+    global post_requests
     link = str(request.form.get('link'))
     if validators.url(link) == False:
         return "invalid url"
-    payload += str(request.form.get('payload'))
-    if payload == None:
+    payload = request.form.get('payload')
+    if payload is None:
         post_requests += [link, json.loads("{}")]
         return "success"
     try:
-        jsonified_payload = json.loads(payload)
+        jsonified_payload = str(json.loads(payload))
         post_requests += [link, payload]
         return "success"
     except:
@@ -43,7 +47,7 @@ def send_request():
             requests.post(j[0], data=j[1])
         except:
             errors+=1
-    return "Total request errors: " + errors
+    return "Total request errors: " + str(errors)
 
 
 

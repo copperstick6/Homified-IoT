@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import './Requests.css';
 import {ButtonGroup, Button, Grid, Col, Fade, Well, FormGroup, FormControl, ControlLabel, HelpBlock} from 'react-bootstrap'
 var validator = require('validator');
+var BASE_REQUEST = "localhost:5000/"
+var request = require("request");
 
 class Requests extends Component {
   constructor(props){
@@ -11,7 +13,10 @@ class Requests extends Component {
       open_p2: false,
       url: "",
       url_2: "",
-      json: ""
+      json: "",
+      urlvalid: false,
+      url2valid: false,
+      jsonvalid: false,
     }
     this.getValidationState = this.getValidationState.bind(this)
     this.getJsonValidationState = this.getJsonValidationState.bind(this)
@@ -29,13 +34,13 @@ class Requests extends Component {
     event.preventDefault()
   }
   changeUrl(event){
-    this.setState({url: event.target.value})
+    this.setState({url: event.target.value, urlvalid: false})
   }
   changeUrl2(event){
-    this.setState({url_2: event.target.value})
+    this.setState({url_2: event.target.value, url2valid: false})
   }
   changePayload(event){
-    this.setState({json: event.target.value})
+    this.setState({json: event.target.value, jsonvalid: false})
   }
   getJsonValidationState(){
     if (validator.isJSON(this.state.json) || this.state.json == null || this.state.json == undefined || this.state.json == ""){
@@ -59,6 +64,8 @@ class Requests extends Component {
   render() {
     let p1 = null
     let p2 = null
+    let cur_but_state = !validator.isURL(this.state.url)
+    let cur_but_state_2 = !(validator.isURL(this.state.url_2) && (validator.isJSON(this.state.json) || this.state.json == null || this.state.json == undefined || this.state.json == ""))
     if(this.state.open){
       p1 = <Fade in={this.state.open}>
       <div>
@@ -77,7 +84,7 @@ class Requests extends Component {
           />
           <FormControl.Feedback />
           <HelpBlock>Must be a valid URL.</HelpBlock>
-          <Button type="submit" onClick = {this.submit_get}>Submit</Button>
+          <Button type="submit" onClick = {this.submit_get} disabled={cur_but_state}>Submit</Button>
         </FormGroup>
       </form>
       </Well>
@@ -120,7 +127,7 @@ class Requests extends Component {
           />
           <FormControl.Feedback />
           <HelpBlock>Must be a valid JSON object.</HelpBlock>
-          <Button type="submit" onClick = {this.submit_post}>Submit</Button>
+          <Button type="submit" onClick = {this.submit_post} disabled={cur_but_state_2}>Submit</Button>
         </FormGroup>
 
       </form>
