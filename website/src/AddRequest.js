@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import './Requests.css';
 import {ButtonGroup, Button, Grid, Col, Fade, Well, FormGroup, FormControl, ControlLabel, HelpBlock} from 'react-bootstrap'
 var validator = require('validator');
-var BASE_REQUEST = "localhost:5000/"
+var BASE_REQUEST = "http://localhost:5000/"
 var request = require("request");
 
 class Requests extends Component {
@@ -11,8 +11,8 @@ class Requests extends Component {
     this.state = {
       open: false,
       open_p2: false,
-      url: "",
-      url_2: "",
+      url: "http://",
+      url_2: "http://",
       json: "",
       urlvalid: false,
       url2valid: false,
@@ -29,9 +29,18 @@ class Requests extends Component {
   }
   submit_get(event){
     event.preventDefault()
+    request.post(BASE_REQUEST + "addNewGet").form({link: this.state.url})
+
   }
   submit_post(event){
     event.preventDefault()
+    if(this.state.json == null || this.state.json == null || this.state.json == ""){
+      request.post(BASE_REQUEST + "addNewPost").form({link: this.state.url2})
+    }
+    else{
+      request.post(BASE_REQUEST + "addNewPost").form({link: this.state.url2, payload: this.state.json})
+    }
+
   }
   changeUrl(event){
     this.setState({url: event.target.value, urlvalid: false})
@@ -49,13 +58,13 @@ class Requests extends Component {
     return 'error'
   }
   getValidationState2(){
-    if (validator.isURL(this.state.url_2)){
+    if (validator.isURL(this.state.url_2) && (this.state.url_2.includes("http://") || this.state.url_2.includes("https://"))){
       return 'success'
     }
     return 'error'
   }
   getValidationState(){
-    if (validator.isURL(this.state.url)){
+    if (validator.isURL(this.state.url) && (this.state.url.includes("http://") || this.state.url.includes("https://"))){
       return 'success'
     }
     return 'error'
@@ -64,8 +73,8 @@ class Requests extends Component {
   render() {
     let p1 = null
     let p2 = null
-    let cur_but_state = !validator.isURL(this.state.url)
-    let cur_but_state_2 = !(validator.isURL(this.state.url_2) && (validator.isJSON(this.state.json) || this.state.json == null || this.state.json == undefined || this.state.json == ""))
+    let cur_but_state = !(validator.isURL(this.state.url) && (this.state.url.includes("http://") || this.state.url.includes("https://")))
+    let cur_but_state_2 = !((validator.isURL(this.state.url_2) && (this.state.url_2.includes("http://") || this.state.url_2.includes("https://"))) && (validator.isJSON(this.state.json) || this.state.json == null || this.state.json == undefined || this.state.json == ""))
     if(this.state.open){
       p1 = <Fade in={this.state.open}>
       <div>
